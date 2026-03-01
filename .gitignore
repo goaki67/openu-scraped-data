@@ -1,1 +1,8 @@
 venv/\n__pycache__/\n*.pyc\n*.db\n.env\n
+bin/
+lib/
+lib64/
+share/
+pyvenv.cfg
+*.jsonl
+
