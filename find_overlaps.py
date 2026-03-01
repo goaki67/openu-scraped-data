@@ -1,23 +1,26 @@
 import json
-import re
+import bs4
 
 def search_overlaps():
+    count = 0
     with open('scraped_course_pages.jsonl', 'r', encoding='windows-1255') as f:
         for line in f:
             try:
                 data = json.loads(line)
                 html = data.get('html', '')
-                if 'חופפ' in html or 'שקול' in html or 'חפיפ' in html:
-                    print(f"Found match in {data['course_id']}")
-                    import bs4
+                if 'חפיפ' in html or 'חופפ' in html:
                     soup = bs4.BeautifulSoup(html, 'html.parser')
-                    for p in soup.find_all(['p', 'div']):
-                        text = p.get_text()
-                        if 'חופפ' in text or 'חפיפ' in text or 'שקול' in text:
-                            print(f"  {text.strip()}")
-                    break
+                    
+                    # Sometimes overlaps are linked:
+                    # <a href="https://www3.openu.ac.il/ouweb/owal/chofef.list?kurs_p=00000...">
+                    for a in soup.find_all('a'):
+                        if 'chofef.list' in a.get('href', ''):
+                            print(f"{data['course_id']}: {a['href']}")
+                            count += 1
+                            if count >= 10:
+                                return
             except Exception as e:
-                continue
+                pass
 
 if __name__ == '__main__':
     search_overlaps()
